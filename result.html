@@ -47,9 +47,19 @@
         </div>
 
         <div class="actions">
+          <button type="button" class="btn btn-primary" id="shareImgBtn" onclick="shareImage()">📸 결과 이미지 공유</button>
+          <button type="button" class="btn btn-cyan" onclick="copyLink()">🔗 링크 복사</button>
           <button type="button" class="btn btn-ghost" onclick="restart()">🔁 다시하기</button>
-          <button type="button" class="btn btn-cyan" onclick="copySummary()">📋 결과 요약 복사</button>
-          <button type="button" class="btn btn-primary" onclick="copyLink()">🔗 링크 공유</button>
+        </div>
+
+        <!-- 공유 카드 미리보기 (이미지 만든 뒤 표시) -->
+        <div id="cardPreview" class="card-preview" style="display:none;">
+          <p class="card-preview-hint">👇 이미지를 길게 눌러 저장하거나, 아래 버튼으로 공유하세요</p>
+          <img id="cardPreviewImg" alt="롤 성향 진단 결과 카드">
+          <div class="card-preview-actions">
+            <a id="cardDownload" class="btn btn-primary" download="lol-diagnosis-result.png">💾 이미지 저장</a>
+            <button type="button" class="btn btn-ghost" onclick="closeCardPreview()">닫기</button>
+          </div>
         </div>
 
         <p class="foot">
@@ -344,6 +354,225 @@
       copyText(t.trim(), '결과 요약이 복사되었어요!');
     }
     function copyLink() { copyText(location.href, '링크가 복사되었어요! 친구에게 공유해보세요.'); }
+
+    // =========================================================
+    //  결과 이미지 카드 생성 & SNS 공유
+    // =========================================================
+    const SHARE_URL = 'https://acekaze.github.io/lol-diagnosis/';
+    let cachedBlob = null;   // 한 번 만든 이미지 재사용
+    let cachedUrl = null;
+
+    // 이미지 로드 헬퍼 (동일 출처 — crossOrigin 미설정이 로컬/GitHub Pages 모두 안전)
+    // 6초 안에 안 오면 실패 처리 → 카드가 영영 안 만들어지는 상황 방지
+    function loadImg(src) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        const timer = setTimeout(() => reject(new Error('img timeout')), 6000);
+        img.onload = () => { clearTimeout(timer); resolve(img); };
+        img.onerror = () => { clearTimeout(timer); reject(new Error('img error')); };
+        img.src = src;
+      });
+    }
+
+    // 웹폰트가 로드될 때까지 대기 (canvas가 시스템 폰트로 그리는 것 방지)
+    async function ensureFonts() {
+      if (!document.fonts || !document.fonts.load) return;
+      try {
+        await Promise.all([
+          document.fonts.load('900 68px "Noto Sans KR"'),
+          document.fonts.load('700 30px "Noto Sans KR"'),
+          document.fonts.load('500 34px "Noto Sans KR"'),
+          document.fonts.load('600 30px "Cinzel"')
+        ]);
+        await document.fonts.ready;
+      } catch (e) { /* 실패해도 시스템 폰트로 진행 */ }
+    }
+
+    // 자동 줄바꿈 텍스트 ("A, B, C" → 쉼표 유지하며 폭 넘으면 줄바꿈)
+    function wrapText(ctx, text, x, y, maxW, lineH) {
+      const chunks = text.split(',').map(t => t.trim()).filter(Boolean);
+      let line = '', yy = y;
+      for (let i = 0; i < chunks.length; i++) {
+        const piece = chunks[i] + (i < chunks.length - 1 ? ',' : '');
+        const test = line ? line + ' ' + piece : piece;
+        if (ctx.measureText(test).width > maxW && line) {
+          ctx.fillText(line, x, yy);
+          line = piece;
+          yy += lineH;
+        } else { line = test; }
+      }
+      if (line) ctx.fillText(line, x, yy);
+      return yy;
+    }
+
+    // 정사각형 카드 그리기 → Blob 반환
+    async function buildCard() {
+      if (!firstTendency) return null;
+      await ensureFonts();
+
+      const S = 1080;                 // 인스타 표준 정사각형
+      const canvas = document.createElement('canvas');
+      canvas.width = S; canvas.height = S;
+      const ctx = canvas.getContext('2d');
+
+      // 1) 배경 (사이트와 동일한 딥블루 그라디언트)
+      const bg = ctx.createLinearGradient(0, 0, 0, S);
+      bg.addColorStop(0, '#0b1a2e');
+      bg.addColorStop(0.5, '#0e2039');
+      bg.addColorStop(1, '#081320');
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, S, S);
+
+      // 상단 골드 글로우
+      const glow = ctx.createRadialGradient(S/2, 60, 40, S/2, 60, 620);
+      glow.addColorStop(0, 'rgba(200,170,110,0.18)');
+      glow.addColorStop(1, 'rgba(200,170,110,0)');
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, S, S);
+
+      // 2) 헥스텍 그리드 패턴
+      ctx.strokeStyle = 'rgba(200,170,110,0.06)';
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= S; i += 60) {
+        ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, S); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(S, i); ctx.stroke();
+      }
+
+      // 3) 골드 프레임 + 모서리 장식
+      const M = 42;
+      ctx.strokeStyle = '#c8aa6e';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(M, M, S - M * 2, S - M * 2);
+      ctx.lineWidth = 6;
+      const c = 60; // 모서리 길이
+      const corners = [[M,M,1,1],[S-M,M,-1,1],[M,S-M,1,-1],[S-M,S-M,-1,-1]];
+      corners.forEach(([x,y,dx,dy]) => {
+        ctx.beginPath();
+        ctx.moveTo(x, y + dy*c); ctx.lineTo(x, y); ctx.lineTo(x + dx*c, y);
+        ctx.stroke();
+      });
+
+      // 4) 상단 라벨
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#c8aa6e';
+      ctx.font = '600 30px Cinzel, "Noto Sans KR", serif';
+      ctx.fillText('SUMMONER\u2019S  RIFT  ·  PERSONALITY  TEST', S/2, 130);
+
+      ctx.fillStyle = '#f0e6d2';
+      ctx.font = '900 52px "Noto Sans KR", sans-serif';
+      ctx.fillText('나의 롤 성향은?', S/2, 200);
+
+      // 구분선
+      ctx.strokeStyle = '#785a28'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(S/2 - 150, 230); ctx.lineTo(S/2 - 20, 230); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(S/2 + 20, 230); ctx.lineTo(S/2 + 150, 230); ctx.stroke();
+      ctx.fillStyle = '#c8aa6e';
+      ctx.save(); ctx.translate(S/2, 230); ctx.rotate(Math.PI/4);
+      ctx.fillRect(-6, -6, 12, 12); ctx.restore();
+
+      // 5) 캐릭터 이미지 (원형)
+      const pos = firstTendency[0];
+      const cx = S/2, cy = 400, R = 130;
+      try {
+        const charImg = await loadImg(IMG(pos));
+        ctx.save();
+        // 배경 원(크림색)
+        ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI*2);
+        ctx.fillStyle = '#efe4cf'; ctx.fill();
+        ctx.clip();
+        ctx.drawImage(charImg, cx - R, cy - R, R*2, R*2);
+        ctx.restore();
+      } catch (e) { /* 이미지 실패해도 계속 */ }
+      // 골드 테두리 링
+      ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI*2);
+      ctx.strokeStyle = '#c8aa6e'; ctx.lineWidth = 6; ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx, cy, R + 10, 0, Math.PI*2);
+      ctx.strokeStyle = 'rgba(200,170,110,0.35)'; ctx.lineWidth = 2; ctx.stroke();
+
+      // 6) 퍼스트 성향 제목
+      const d = positionDataStore[pos];
+      const title = d.title.split(' (')[0]; // 한글명만
+      ctx.fillStyle = '#c8aa6e';
+      ctx.font = '600 30px Cinzel, "Noto Sans KR", serif';
+      ctx.fillText('🥇 나의 퍼스트 성향', S/2, 610);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 68px "Noto Sans KR", sans-serif';
+      ctx.fillText(title, S/2, 685);
+
+      // 7) 세컨드 성향
+      if (secondTendency) {
+        const sTitle = positionDataStore[secondTendency[0]].title.split(' (')[0];
+        ctx.fillStyle = '#9fb0c4';
+        ctx.font = '500 34px "Noto Sans KR", sans-serif';
+        ctx.fillText('🥈 세컨드 · ' + sTitle, S/2, 745);
+      }
+
+      // 8) 강점 키워드 박스
+      const boxY = secondTendency ? 795 : 760;
+      ctx.fillStyle = '#0ac8b9';
+      ctx.font = '700 30px "Noto Sans KR", sans-serif';
+      ctx.fillText('강점 키워드', S/2, boxY);
+      ctx.fillStyle = '#f0e6d2';
+      ctx.font = '500 34px "Noto Sans KR", sans-serif';
+      wrapText(ctx, d.pros, S/2, boxY + 52, S - 220, 46);
+
+      // 9) 하단 사이트 주소 (브랜딩)
+      ctx.fillStyle = 'rgba(200,170,110,0.9)';
+      ctx.font = '600 30px Cinzel, "Noto Sans KR", serif';
+      ctx.fillText('acekaze.github.io/lol-diagnosis', S/2, S - 75);
+
+      return await new Promise(res => canvas.toBlob(res, 'image/png'));
+    }
+
+    async function shareImage() {
+      const btn = document.getElementById('shareImgBtn');
+      btn.classList.add('loading');
+      const original = btn.textContent;
+      btn.textContent = '이미지 만드는 중…';
+
+      try {
+        if (!cachedBlob) {
+          cachedBlob = await buildCard();
+          if (!cachedBlob) { showToast('결과 정보가 없어요.'); return; }
+          cachedUrl = URL.createObjectURL(cachedBlob);
+        }
+
+        const file = new File([cachedBlob], 'lol-diagnosis-result.png', { type: 'image/png' });
+        const shareData = {
+          title: '나의 롤 성향 진단 결과',
+          text: '나의 롤 성향은? 너도 해봐! ' + SHARE_URL,
+          files: [file]
+        };
+
+        // 모바일: 네이티브 공유 (카톡/인스타/문자 등)
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share(shareData);
+        } else {
+          // PC 등: 미리보기 + 저장 버튼 노출
+          showPreview();
+        }
+      } catch (e) {
+        // 공유 취소(AbortError)는 조용히 무시, 그 외엔 미리보기로 폴백
+        if (e && e.name === 'AbortError') { /* 사용자가 취소함 */ }
+        else { showPreview(); }
+      } finally {
+        btn.classList.remove('loading');
+        btn.textContent = original;
+      }
+    }
+
+    function showPreview() {
+      if (!cachedUrl) return;
+      document.getElementById('cardPreviewImg').src = cachedUrl;
+      const dl = document.getElementById('cardDownload');
+      dl.href = cachedUrl;
+      const box = document.getElementById('cardPreview');
+      box.style.display = 'block';
+      box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    function closeCardPreview() {
+      document.getElementById('cardPreview').style.display = 'none';
+    }
   </script>
 </body>
 </html>

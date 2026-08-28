@@ -608,3 +608,42 @@ body::before {
   .trait-body { padding-left: 18px; }
   .actions .btn { min-width: 0; flex: 1 1 45%; }
 }
+
+
+/* ---------- 공유 카드 미리보기 ---------- */
+.card-preview {
+  margin-top: 24px;
+  padding: 20px;
+  background: linear-gradient(180deg, #1c3350, #12253f);
+  border: 1px solid var(--gold-1);
+  border-radius: var(--radius);
+  text-align: center;
+  animation: fadeUp .4s ease both;
+}
+.card-preview-hint {
+  color: var(--gold-1);
+  font-size: 0.9rem;
+  margin: 0 0 14px;
+  line-height: 1.5;
+}
+.card-preview img {
+  width: 100%;
+  max-width: 340px;
+  border-radius: var(--radius);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+  border: 1px solid var(--gold-3);
+}
+.card-preview-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+.card-preview-actions .btn { min-width: 130px; }
+
+/* 버튼 로딩 상태 */
+.btn.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
