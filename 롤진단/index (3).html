@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>마법공학 성향 분석 아카데미</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;600&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* "마법공학 아카데미" CSS 스타일 */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #0A192F; /* 깊은 남색 배경 */
+            color: #E0E0E0; /* 기본 텍스트 색상 (밝은 회색) */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden; /* 배경 애니메이션 등이 넘치지 않도록 */
+            position: relative; /* 자식 절대 위치 요소 기준 */
+        }
+
+        /* 배경에 은은한 마법공학 패턴이나 애니메이션 추가 (옵션) */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image: url('img/hextech_pattern_background.png'); /* 예시: 마법공학 패턴 이미지 경로 */
+            background-size: cover; /* 또는 repeat, subtle patterns from HeroPatterns, etc. */
+            opacity: 0.05; /* 매우 은은하게 */
+            z-index: -1;
+            /* 애니메이션 예시:
+            animation: subtle 움직임 60s linear infinite;
+            */
+        }
+        /*
+        @keyframes subtle-움직임 {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
+        }
+        */
+
+        .title-container {
+            text-align: center;
+            padding: 40px;
+            background-color: rgba(10, 25, 47, 0.8); /* 반투명 배경으로 깊이감 */
+            border: 2px solid #B8860B; /* 황동색 테두리 */
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(184, 134, 11, 0.5); /* 황동색 빛나는 효과 */
+            max-width: 600px;
+            width: 80%;
+            position: relative; /* 장식 요소 기준 */
+            z-index: 1;
+        }
+
+        /* 장식적 요소 (예: 모서리 장식) */
+        .title-container::before, .title-container::after {
+            content: "";
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-color: #DAA520; /* 금색 계열 */
+            border-style: solid;
+        }
+        .title-container::before { /* 왼쪽 상단 */
+            top: -10px; left: -10px;
+            border-width: 3px 0 0 3px;
+        }
+        .title-container::after { /* 오른쪽 하단 */
+            bottom: -10px; right: -10px;
+            border-width: 0 3px 3px 0;
+        }
+
+
+        .main-title {
+            font-family: 'Orbitron', sans-serif; /* 마법공학 느낌의 각진 폰트 */
+            font-size: 2.8em;
+            color: #DAA520; /* 금색 */
+            text-shadow: 0 0 10px #DAA520, 0 0 20px #B8860B; /* 빛나는 효과 */
+            margin-bottom: 15px;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-family: 'Rajdhani', sans-serif; /* 좀 더 가독성 있는 보조 폰트 */
+            font-size: 1.4em;
+            color: #AFEEEE; /* 밝은 청록색 */
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .start-button {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2em;
+            padding: 15px 35px;
+            color: #0A192F; /* 버튼 텍스트는 어둡게 */
+            background: linear-gradient(145deg, #CFB53B, #B8860B); /* 금색 그라데이션 */
+            border: 2px solid #DAA520;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(218, 165, 32, 0.4);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .start-button:hover {
+            background: linear-gradient(145deg, #E6C34C, #DAA520);
+            box-shadow: 0 6px 20px rgba(218, 165, 32, 0.6);
+            transform: translateY(-2px);
+        }
+        /* 버튼 클릭 시 빛나는 효과 (옵션) */
+        .start-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300%; /* 원 크기를 크게 */
+            height: 300%;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.5s ease;
+        }
+        .start-button:active::before {
+            transform: translate(-50%, -50%) scale(1);
+            transition: transform 0s; /* 즉시 커지도록 */
+        }
+
+
+        /* 반응형 추가 */
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2em;
+            }
+            .subtitle {
+                font-size: 1.1em;
+            }
+            .start-button {
+                font-size: 1em;
+                padding: 12px 30px;
+            }
+            .title-container {
+                padding: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="title-container">
+        <h1 class="main-title">마법공학 성향 분석기</h1>
+        <p class="subtitle">소환사님의 잠재된 기질을 발견하고<br>최적의 역할을 찾아보세요.</p>
+        <a href="quiz.html" class="start-button">아카데미 입학 (진단 시작)</a>
+    </div>
+
+    </body>
+</html>
