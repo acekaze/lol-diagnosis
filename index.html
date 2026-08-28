@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>롤 성향 진단 · 나의 포지션은?</title>
+  <meta name="description" content="10개의 질문으로 알아보는 나의 롤 성향. 탑·정글·미드·원딜·서폿 중 당신의 기질에 딱 맞는 포지션과 챔피언을 찾아보세요.">
+
+  <!-- 공유 미리보기 -->
+  <meta property="og:title" content="롤 성향 진단 · 나의 포지션은?">
+  <meta property="og:description" content="10문항으로 알아보는 나의 라인과 추천 챔피언. 지금 바로 진단해보세요.">
+  <meta property="og:type" content="website">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="assets/styles.css">
+
+  <style>
+    /* 시작 화면 전용 레이아웃 */
+    .hero-page {
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .hero {
+      max-width: 620px;
+      text-align: center;
+      padding: 44px 34px 38px;
+    }
+    .hero-champs {
+      display: flex;
+      justify-content: center;
+      gap: -10px;
+      margin: 4px 0 22px;
+    }
+    .hero-champs img {
+      width: 66px; height: 66px;
+      border-radius: 50%;
+      object-fit: contain;
+      background: radial-gradient(circle, #f0e6d2, #d9cbb0);
+      border: 2px solid var(--gold-3);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+      margin-left: -14px;
+      transition: transform .2s ease;
+    }
+    .hero-champs img:first-child { margin-left: 0; }
+    .hero-champs img:hover { transform: translateY(-6px) scale(1.08); z-index: 2; }
+    .hero .lead-note {
+      display: inline-block;
+      margin: 4px 0 22px;
+      font-size: 0.86rem;
+      color: var(--gold-1);
+      background: rgba(200,170,110,0.08);
+      border: 1px solid var(--gold-3);
+      border-radius: 20px;
+      padding: 6px 16px;
+    }
+    .steps {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 8px 0 26px;
+      flex-wrap: wrap;
+    }
+    .step {
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      background: var(--bg-2);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 7px 14px;
+    }
+    .step b { color: var(--gold-1); }
+    @media (max-width: 600px) {
+      .hero { padding: 32px 18px; }
+      .hero-champs img { width: 52px; height: 52px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page hero-page">
+    <div class="frame hero reveal">
+      <p class="brand-kicker">Summoner's Rift · Personality Test</p>
+      <h1 class="title">나의 <span class="accent">롤 성향</span> 진단</h1>
+
+      <div class="hero-champs">
+        <img src="assets/img/top.png" alt="탑">
+        <img src="assets/img/jungle.png" alt="정글">
+        <img src="assets/img/mid.png" alt="미드">
+        <img src="assets/img/adc.png" alt="원딜">
+        <img src="assets/img/support.png" alt="서폿">
+      </div>
+
+      <p class="subtitle">
+        10개의 질문에 답하면<br>
+        당신의 기질에 딱 맞는 라인과 챔피언을 찾아드려요.
+      </p>
+
+      <span class="lead-note">⏱ 약 2분 소요 · 로그인 없음</span>
+
+      <div class="steps">
+        <span class="step"><b>1</b> 질문에 답하기</span>
+        <span class="step"><b>2</b> 성향 분석</span>
+        <span class="step"><b>3</b> 라인·챔피언 추천</span>
+      </div>
+
+      <div class="divider"><span class="gem"></span></div>
+
+      <a href="quiz.html" class="btn btn-primary btn-block">⚔️ 진단 시작하기</a>
+
+      <p class="foot">
+        <span class="disclaimer">본 진단은 재미를 위한 콘텐츠이며, 실제 실력이나 성격을 규정하지 않습니다.</span>
+      </p>
+    </div>
+  </div>
+</body>
+</html>

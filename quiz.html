@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>롤 성향 진단 · 질문</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div class="page">
+
+    <!-- 진행바 -->
+    <div class="progress">
+      <div class="progress-head">
+        <span>진단 진행률</span>
+        <span class="count"><span id="answeredCount">0</span> / 10</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+    </div>
+
+    <div class="wrap">
+      <div class="frame">
+        <p class="brand-kicker">Summoner's Rift · Personality Test</p>
+        <h1 class="title">나의 <span class="accent">성향</span>을 찾아서</h1>
+        <p class="subtitle">직감으로 편하게 골라주세요. 정답은 없어요.</p>
+        <div class="divider"><span class="gem"></span></div>
+
+        <form id="quizForm">
+          <div class="q-card">
+            <div class="q-num">Q1</div>
+            <p class="q-text">나는 어떤 상황을 가장 도와주고 싶은가?</p>
+            <label class="opt"><input type="radio" name="q1" value="1"> 무거운 짐을 들고 계신 아주머니의 짐 들어 드리기</label>
+            <label class="opt"><input type="radio" name="q1" value="2"> 양아치에게 삥을 뜯기고 있는 어린 소년을 위해 경찰에 신고</label>
+            <label class="opt"><input type="radio" name="q1" value="3"> 무단 주차로 차량 정체를 유발하는 비양심 차량 신고</label>
+            <label class="opt"><input type="radio" name="q1" value="4"> 쓰러진 학생의 응급처치를 하며 주변 사람들에게 행동 요청하기</label>
+            <label class="opt"><input type="radio" name="q1" value="5"> 집안 문제로 울고 있는 친구를 위로하고 조언하기</label>
+          </div>
+
+          <div class="q-card">
+            <div class="q-num">Q2</div>
+            <p class="q-text">타지에서 지갑을 잃어버렸다. 당신의 다음 행동은?</p>
+            <label class="opt"><input type="radio" name="q2" value="1"> 주변 사람들에게 지갑을 잃어버렸다고 알리며 도움을 요청한다.</label>
+            <label class="opt"><input type="radio" name="q2" value="2"> 지갑을 찾을 수 있을 리 없다. 일단 숙소로 돌아간다.</label>
+            <label class="opt"><input type="radio" name="q2" value="3"> 근처 경찰서나 분실물 센터를 찾아 신고가 되어 있는지 확인한다.</label>
+            <label class="opt"><input type="radio" name="q2" value="4"> 숙소에 있는 동행에게 전화해서 데리러 와달라고 한다.</label>
+            <label class="opt"><input type="radio" name="q2" value="5"> 곰곰이 왔던 길을 생각해보고 그대로 돌아가면서 찾아본다.</label>
+          </div>
+
+          <div class="q-card">
+            <div class="q-num">Q3</div>
+            <p class="q-text">내가 가장 싫어하는 선생님 유형은?</p>
+            <label class="opt"><input type="radio" name="q3" value="1"> 틀에 박힌 방식으로 이래라 저래라 하는 선생님</label>
+            <label class="opt"><input type="radio" name="q3" value="2"> 학생들에게 막말, 상처 주는 선생님</label>
+            <label class="opt"><input type="radio" name="q3" value="3"> 힘든 일을 마구 시키며 고맙다는 말 한마디 없는 선생님</label>
+            <label class="opt"><input type="radio" name="q3" value="4"> 내 노력과 상관없이 조별과제 결과로 싸잡아 평가하는 선생님</label>
+            <label class="opt"><input type="radio" name="q3" value="5"> 감정 조절이 안 되고 변덕스러운 선생님</label>
+          </div>
+
+          <div class="q-card">
+            <div class="q-num">Q4</div>
+            <p class="q-text">능력으로 돈을 받는다면, 가장 비싸게 매겨질 것 같은 나의 능력은?</p>
+            <label class="opt"><input type="radio" name="q4" value="1"> 배려심과 친절함</label>
+            <label class="opt"><input type="radio" name="q4" value="2"> 독창성 & 창의성</label>
+            <label class="opt"><input type="radio" name="q4" value="3"> 판단력과 집중력</label>
+            <label class="opt"><input type="radio" name="q4" value="4"> 리더십과 적극성</label>
+            <label class="opt"><input type="radio" name="q4" value="5"> 목표 달성 능력과 추진력</label>
+          </div>
+
+          <div class="q-card">
+            <div class="q-num">Q5</div>
+            <p class="q-text">새로운 음식점에 갔다. 당신이 메뉴를 고르는 방법은?</p>
+            <label class="opt"><input type="radio" name="q5" value="1"> 너 이거 시켜, 나 이거 시킬게, 나눠 먹자</label>
+            <label class="opt"><input type="radio" name="q5" value="2"> (자기가 먹고 싶은 거 시킨 후) 나 그거 한입만 줘</label>
+            <label class="opt"><input type="radio" name="q5" value="3"> 여기 제일 잘 나가는 메뉴 주세요.</label>
+            <label class="opt"><input type="radio" name="q5" value="4"> (인터넷 검색 후) 이게 평이 제일 좋네. 이걸로 할게요.</label>
+            <label class="opt"><input type="radio" name="q5" value="5"> 너 뭐 먹을 거야? 나도 그거 먹을래</label>
+          </div>
+
+          <div class="q-card">
+            <div class="q-num">Q6</div>
+            <p class="q-text">내가 동기부여 되는 상황은?</p>
+            <label class="opt"><input type="radio" name="q6" value="1"> 자신 있고 잘하는 역할을 맡아, 실수 없이 완벽하게 해냈을 때</label>
+            <label class="opt"><input type="radio" name="q6" value="2"> 내가 돋보일 수 있다는 생각이 들 때</label>
+            <label class="opt"><input type="radio" name="q6" value="3"> 명확한 목표가 주어질 때</label>
+            <label class="opt"><input type="radio" name="q6" value="4"> 계획한 대로 노력했을 때, 확실하고 공정한 결과가 보장된다고 느낄 때</label>
+            <label class="opt"><input type="radio" name="q6" value="5"> 내가 하고 싶은 걸 할 수 있을 때 (자유도가 보장)</label>
+          </div>
+
+          <div class="q-card">
+            <div class="q-num">Q7</div>
+            <p class="q-text">친구와 싸운 후 나의 화해 방법은?</p>
+            <label class="opt"><input type="radio" name="q7" value="1"> 일부러 더 아무렇지 않은 듯 연락한다. "야 피방 고고?!"</label>
+            <label class="opt"><input type="radio" name="q7" value="2"> 내가 먼저 감정을 얘기하며 대화를 연다. "야 불편해서 안 되겠어, 얘기 좀 하자."</label>
+            <label class="opt"><input type="radio" name="q7" value="3"> 상대 입장을 먼저 듣고 내 입장을 말한다. "니 입장도 이해된다. 하지만 나는 이래서 그랬어."</label>
+            <label class="opt"><input type="radio" name="q7" value="4"> 사실관계를 따져 서로의 잘못을 이성적으로 판단한다. "너도 이거 잘못했지? 그래, 이건 나도 잘못했어."</label>
+            <label class="opt"><input type="radio" name="q7" value="5"> 농담이나 공통 화제로 분위기를 바꾸며 눈치를 살핀다. "…근데 어제 페이커 개쩔지 않음? …어젠 내가 미안ㅎㅎ"</label>
+          </div>
+
+          <div class="q-card">
+            <div class="q-num">Q8</div>
+            <p class="q-text">방탈출 마지막 방. 몇 번 안 남은 기회와 시간, 탈출을 위한 당신의 행동은?</p>
+            <label class="opt"><input type="radio" name="q8" value="1"> 기회를 날릴 수 있으니 답이 확실하기 전까지는 조심하자</label>
+            <label class="opt"><input type="radio" name="q8" value="2"> 우리에게 남은 시간이 얼마지? 아직 안 쓴 도구가 있나?</label>
+            <label class="opt"><input type="radio" name="q8" value="3"> 너는 저쪽에서 도구를 더 찾고, 너는 이쪽을 살펴봐.</label>
+            <label class="opt"><input type="radio" name="q8" value="4"> 난 아무래도 그게 맘에 걸려, 그것만 체크하고 올게.</label>
+            <label class="opt"><input type="radio" name="q8" value="5"> 오히려 간단할 수도 있어. 내가 볼 땐 이거 같아. 일단 시도해보자</label>
+          </div>
+
+          <div class="q-card">
+            <div class="q-num">Q9</div>
+            <p class="q-text">친구들과 여행을 가기로 했다. 나는 어떤 타입인가?</p>
+            <label class="opt"><input type="radio" name="q9" value="1"> 여행 갈 곳을 사전에 조사하고 계획해서 친구들에게 알린다.</label>
+            <label class="opt"><input type="radio" name="q9" value="2"> 조심스럽게 친구들에게 가고 싶은 곳을 물어본다.</label>
+            <label class="opt"><input type="radio" name="q9" value="3"> 여행지를 정하고 그 장소를 밀어붙인다.</label>
+            <label class="opt"><input type="radio" name="q9" value="4"> 친구들이 찾은 여행지를 검토하며 더 나은 대안을 제시한다.</label>
+            <label class="opt"><input type="radio" name="q9" value="5"> 내가 찾은 후보지를 어필하며 칭찬을 기대한다.</label>
+          </div>
+
+          <div class="q-card">
+            <div class="q-num">Q10</div>
+            <p class="q-text">썸 타는 친구에게 카톡을 보냈으나 1시간째 안 읽는다. 당신의 반응은?</p>
+            <label class="opt"><input type="radio" name="q10" value="1"> 전화해본다. "충분히 기다렸으니 일단 전화하자"</label>
+            <label class="opt"><input type="radio" name="q10" value="2"> 현재 상황을 물어본다. "카톡 안 보네. 바쁜 일 있어?"</label>
+            <label class="opt"><input type="radio" name="q10" value="3"> 농담이나 유머를 던진다. "어허~ 김 사장 어디 가셨나~?"</label>
+            <label class="opt"><input type="radio" name="q10" value="4"> 올 때까지 기다리며 수차례 확인한다.</label>
+            <label class="opt"><input type="radio" name="q10" value="5"> 상대방이 연락하게 한다. "문자 보면 바로 연락 줘"</label>
+          </div>
+
+          <button type="button" id="submitBtn" class="btn btn-primary btn-block" onclick="showSimpleResult()">
+            📜 결과 보기
+          </button>
+        </form>
+
+        <div id="miniResult" class="mini-result reveal" style="display:none;">
+          <h3>✨ 당신의 주요 성향 ✨</h3>
+          <p class="rank-line" id="first"></p>
+          <p class="rank-line" id="second"></p>
+          <button type="button" class="btn btn-cyan btn-block" style="margin-top:18px;" onclick="goToResult()">
+            📊 상세 결과 · 챔피언 추천 보기
+          </button>
+        </div>
+      </div>
+
+      <p class="foot"><a href="index.html" style="color:var(--text-dim);">← 처음으로</a></p>
+    </div>
+  </div>
+
+  <script>
+    // ---- 채점 매핑 (원본 로직 유지) ----
+    const answerMappings = {
+      q1: { '1': '서폿', '2': '탑', '3': '원딜', '4': '미드', '5': '정글' },
+      q2: { '1': '정글', '2': '탑', '3': '원딜', '4': '미드', '5': '서폿' },
+      q3: { '1': '정글', '2': '서폿', '3': '미드', '4': '탑', '5': '원딜' },
+      q4: { '1': '서폿', '2': '정글', '3': '원딜', '4': '미드', '5': '탑' },
+      q5: { '1': '미드', '2': '정글', '3': '탑', '4': '원딜', '5': '서폿' },
+      q6: { '1': '서폿', '2': '미드', '3': '탑', '4': '원딜', '5': '정글' },
+      q7: { '1': '탑', '2': '미드', '3': '서폿', '4': '원딜', '5': '정글' },
+      q8: { '1': '서폿', '2': '원딜', '3': '미드', '4': '정글', '5': '탑' },
+      q9: { '1': '원딜', '2': '서폿', '3': '탑', '4': '정글', '5': '미드' },
+      q10:{ '1': '탑', '2': '원딜', '3': '정글', '4': '서폿', '5': '미드' }
+    };
+    const positionTitles = { "탑":"탑 라이너", "정글":"정글러", "미드":"미드 라이너", "원딜":"원거리 딜러", "서폿":"서포터" };
+    const TOTAL = 10;
+
+    // ---- 선택 시각화 + 진행바 갱신 ----
+    const form = document.getElementById('quizForm');
+    form.addEventListener('change', function (e) {
+      if (e.target.type !== 'radio') return;
+      document.querySelectorAll(`input[name="${e.target.name}"]`).forEach(r => {
+        if (r.parentElement.classList.contains('opt')) r.parentElement.classList.remove('selected');
+      });
+      if (e.target.parentElement.classList.contains('opt')) e.target.parentElement.classList.add('selected');
+      updateProgress();
+    });
+
+    function countAnswered() {
+      let n = 0;
+      for (let i = 1; i <= TOTAL; i++) if (form.elements['q' + i] && form.elements['q' + i].value) n++;
+      return n;
+    }
+    function updateProgress() {
+      const n = countAnswered();
+      document.getElementById('answeredCount').textContent = n;
+      document.getElementById('progressBar').style.width = (n / TOTAL * 100) + '%';
+    }
+
+    // ---- 결과 계산 ----
+    function showSimpleResult() {
+      const answers = {};
+      for (let i = 1; i <= TOTAL; i++) {
+        const g = form.elements['q' + i];
+        if (!g || !g.value) {
+          alert('아직 답하지 않은 질문이 있어요! (' + countAnswered() + '/' + TOTAL + ')');
+          // 첫 미응답 질문으로 스크롤
+          for (let j = 1; j <= TOTAL; j++) {
+            const gg = form.elements['q' + j];
+            if (!gg || !gg.value) {
+              gg[0].closest('.q-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
+              break;
+            }
+          }
+          return;
+        }
+        answers['q' + i] = g.value;
+      }
+
+      const points = { "탑":0, "정글":0, "미드":0, "원딜":0, "서폿":0 };
+      for (const q in answers) {
+        const v = answers[q];
+        if (answerMappings[q] && answerMappings[q][v]) points[answerMappings[q][v]]++;
+      }
+      sessionStorage.setItem('lolQuizScores', JSON.stringify(points));
+
+      const sorted = Object.entries(points).sort((a, b) => b[1] - a[1]);
+      const [firstName, firstScore] = sorted[0];
+      document.getElementById('first').innerHTML =
+        `🥇 퍼스트 성향: <b>${positionTitles[firstName]}</b> (${firstScore}점)`;
+
+      const secondEl = document.getElementById('second');
+      if (sorted[1] && sorted[1][1] > 0) {
+        secondEl.innerHTML = `🥈 세컨드 성향: <b>${positionTitles[sorted[1][0]]}</b> (${sorted[1][1]}점)`;
+      } else {
+        secondEl.textContent = '뚜렷한 세컨드 성향은 나타나지 않았어요.';
+      }
+
+      document.getElementById('submitBtn').style.display = 'none';
+      const mini = document.getElementById('miniResult');
+      mini.style.display = 'block';
+      mini.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function goToResult() { window.location.href = 'result.html'; }
+
+    updateProgress();
+  </script>
+</body>
+</html>
