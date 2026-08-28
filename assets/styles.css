@@ -1,0 +1,610 @@
+/* =========================================================
+   롤 성향 진단 - 공용 스타일
+   콘셉트: 헥스텍 골드 + 협곡 딥블루 (LoL 클라이언트 로비 감성)
+   ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+
+/* 폰트 로드 실패 시에도 한글이 깨지지 않도록 시스템 폰트 폴백 강화 */
+
+:root {
+  /* 협곡 딥블루 계열 */
+  --bg-0:      #010a13;   /* 가장 깊은 배경 */
+  --bg-1:      #0a1428;   /* 패널 배경 */
+  --bg-2:      #0f2036;   /* 카드 배경 */
+  --bg-3:      #16283e;   /* 밝은 카드 */
+  --line:      #1e3a52;   /* 경계선 블루 */
+
+  /* 헥스텍 골드 계열 */
+  --gold-0:    #f0e6d2;   /* 밝은 텍스트(양피지 톤) */
+  --gold-1:    #c8aa6e;   /* 기본 골드 */
+  --gold-2:    #cdbe91;   /* 밝은 골드 */
+  --gold-3:    #785a28;   /* 어두운 골드(테두리) */
+  --gold-4:    #463714;   /* 가장 어두운 골드 */
+
+  /* 청록 강조(헥스텍 마나) */
+  --cyan:      #0ac8b9;
+  --cyan-dim:  #0a97a8;
+
+  /* 상태색 */
+  --pros:      #47d17c;
+  --cons:      #ff6b6b;
+
+  --text:      #d6e0ec;
+  --text-dim:  #9fb0c4;
+
+  --radius:    6px;
+  --maxw:      880px;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(ellipse at 50% -5%, rgba(200,170,110,0.16), transparent 50%),
+    radial-gradient(ellipse at 50% 110%, rgba(10,200,185,0.10), transparent 55%),
+    linear-gradient(180deg, #071320 0%, #0e1f38 45%, #071320 100%);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 은은한 헥스텍 그리드 패턴 오버레이 */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(200,170,110,0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(200,170,110,0.035) 1px, transparent 1px);
+  background-size: 44px 44px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ---------- 레이아웃 ---------- */
+.page {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 16px 64px;
+}
+
+.wrap {
+  width: 100%;
+  max-width: var(--maxw);
+  margin: 0 auto;
+}
+
+/* ---------- 헥스텍 프레임(카드) ---------- */
+.frame {
+  position: relative;
+  background: linear-gradient(180deg, #1c3350 0%, #12253f 55%, #0e2039 100%);
+  border: 1px solid var(--gold-1);
+  border-radius: var(--radius);
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,0.6),
+    0 18px 55px rgba(0,0,0,0.6),
+    0 0 40px rgba(200,170,110,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.04);
+  padding: 32px 28px;
+}
+/* 프레임 모서리 골드 장식 */
+.frame::before,
+.frame::after {
+  content: "";
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--gold-1);
+  opacity: 0.8;
+}
+.frame::before { top: -1px; left: -1px; border-right: 0; border-bottom: 0; }
+.frame::after  { bottom: -1px; right: -1px; border-left: 0; border-top: 0; }
+
+/* ---------- 타이포 ---------- */
+.brand-kicker {
+  font-family: 'Cinzel', 'Noto Sans KR', 'Malgun Gothic', serif;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  color: var(--gold-1);
+  text-align: center;
+  margin: 0 0 10px;
+  opacity: 0.85;
+}
+
+.title {
+  font-family: 'Cinzel', 'Noto Sans KR', serif;
+  font-weight: 700;
+  text-align: center;
+  color: var(--gold-0);
+  font-size: clamp(1.6rem, 5vw, 2.6rem);
+  line-height: 1.25;
+  margin: 0 0 14px;
+  text-shadow: 0 2px 18px rgba(200,170,110,0.35);
+}
+.title .accent { color: var(--gold-1); }
+
+.subtitle {
+  text-align: center;
+  color: var(--text-dim);
+  font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+  line-height: 1.7;
+  margin: 0 auto 4px;
+  max-width: 30em;
+}
+
+/* 골드 구분선 (다이아몬드 장식) */
+.divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 22px auto;
+  color: var(--gold-3);
+}
+.divider::before,
+.divider::after {
+  content: "";
+  height: 1px;
+  width: 80px;
+  background: linear-gradient(90deg, transparent, var(--gold-3));
+}
+.divider::after { background: linear-gradient(90deg, var(--gold-3), transparent); }
+.divider .gem {
+  width: 8px; height: 8px;
+  transform: rotate(45deg);
+  background: var(--gold-1);
+  box-shadow: 0 0 8px rgba(200,170,110,0.7);
+}
+
+/* ---------- 버튼 ---------- */
+.btn {
+  font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 1.02rem;
+  padding: 14px 30px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  border: 1px solid var(--gold-3);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform .15s ease, box-shadow .2s ease, background .2s ease;
+  user-select: none;
+}
+.btn-primary {
+  color: #10141a;
+  background: linear-gradient(180deg, var(--gold-2), var(--gold-1) 60%, var(--gold-3));
+  box-shadow: 0 6px 20px rgba(200,170,110,0.28);
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(200,170,110,0.45);
+}
+.btn-primary:active { transform: translateY(0); }
+
+.btn-ghost {
+  color: var(--gold-1);
+  background: rgba(200,170,110,0.06);
+  border-color: var(--gold-3);
+}
+.btn-ghost:hover {
+  background: rgba(200,170,110,0.14);
+  transform: translateY(-2px);
+}
+
+.btn-cyan {
+  color: #04201f;
+  background: linear-gradient(180deg, var(--cyan), var(--cyan-dim));
+  border-color: var(--cyan-dim);
+}
+.btn-cyan:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(10,200,185,0.35); }
+
+.btn-block { display: flex; width: 100%; }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+
+/* ---------- 진행바 ---------- */
+.progress {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  width: 100%;
+  max-width: var(--maxw);
+  margin: 0 auto 4px;
+  padding: 10px 2px;
+  background: linear-gradient(180deg, var(--bg-0) 70%, transparent);
+}
+.progress-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 0.85rem;
+  color: var(--gold-1);
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+.progress-head .count { color: var(--gold-0); }
+.progress-track {
+  height: 8px;
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  overflow: hidden;
+}
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--gold-3), var(--gold-1), var(--cyan));
+  border-radius: 20px;
+  transition: width .35s ease;
+  box-shadow: 0 0 10px rgba(200,170,110,0.5);
+}
+
+/* ---------- 퀴즈 카드 ---------- */
+.q-card {
+  background: linear-gradient(180deg, #24406240, #1a3252);
+  border: 1px solid #2c4d70;
+  border-left: 3px solid var(--gold-1);
+  border-radius: var(--radius);
+  padding: 22px 22px 18px;
+  margin-bottom: 22px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+}
+.q-num {
+  font-family: 'Cinzel', 'Noto Sans KR', 'Malgun Gothic', serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.15em;
+  color: var(--gold-1);
+  margin-bottom: 6px;
+}
+.q-text {
+  font-size: 1.14rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.55;
+  margin: 0 0 16px;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.5);
+}
+.opt {
+  display: block;
+  position: relative;
+  cursor: pointer;
+  margin-bottom: 10px;
+  padding: 13px 16px 13px 46px;
+  border-radius: var(--radius);
+  background: rgba(12, 24, 40, 0.6);
+  border: 1px solid #375880;
+  color: #eaf1f9;
+  line-height: 1.55;
+  transition: all .15s ease;
+  font-size: 0.98rem;
+}
+.opt:hover {
+  border-color: var(--gold-1);
+  background: rgba(200,170,110,0.12);
+  color: #ffffff;
+}
+.opt::before {
+  content: "";
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--gold-3);
+  transition: all .15s ease;
+}
+.opt.selected {
+  border-color: var(--gold-1);
+  background: linear-gradient(90deg, rgba(200,170,110,0.16), rgba(200,170,110,0.05));
+  color: var(--gold-0);
+  box-shadow: inset 0 0 12px rgba(200,170,110,0.12);
+}
+.opt.selected::before {
+  background: var(--gold-1);
+  border-color: var(--gold-2);
+  box-shadow: 0 0 0 3px rgba(200,170,110,0.2), 0 0 8px rgba(200,170,110,0.6);
+}
+.opt input { position: absolute; opacity: 0; width: 0; height: 0; }
+
+/* ---------- 간이 결과 박스 ---------- */
+.mini-result {
+  margin-top: 26px;
+  text-align: center;
+  padding: 26px 20px;
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, var(--bg-3), var(--bg-1));
+  border: 1px solid var(--gold-3);
+  box-shadow: inset 0 0 30px rgba(200,170,110,0.08);
+}
+.mini-result h3 {
+  font-family: 'Cinzel', 'Noto Sans KR', 'Malgun Gothic', serif;
+  color: var(--gold-1);
+  font-size: 1.3rem;
+  margin: 0 0 16px;
+}
+.mini-result .rank-line {
+  font-size: 1.15rem;
+  margin: 8px 0;
+  color: var(--text);
+}
+.mini-result .rank-line b { color: var(--gold-0); }
+
+/* ---------- 결과 페이지 ---------- */
+.chart-box {
+  width: 100%;
+  max-width: 420px;
+  margin: 8px auto 26px;
+  padding: 18px;
+  background: radial-gradient(ellipse at center, var(--bg-2), var(--bg-0));
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: inset 0 0 24px rgba(0,0,0,0.6);
+}
+
+.section-title {
+  font-family: 'Cinzel', 'Noto Sans KR', 'Malgun Gothic', serif;
+  text-align: center;
+  color: var(--cyan);
+  font-size: 1.25rem;
+  margin: 36px 0 18px;
+  letter-spacing: 0.05em;
+}
+
+/* 점수 뱃지 */
+.score-badges {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+.score-badges li {
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  font-size: 0.95rem;
+  color: var(--text);
+}
+.score-badges li b { color: var(--gold-1); }
+
+/* 성향 결과 카드 */
+.tendency {
+  margin: 22px 0;
+  padding: 26px 24px;
+  background: linear-gradient(180deg, var(--bg-2), var(--bg-1));
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  overflow: hidden;
+}
+.tendency.first { border-color: var(--gold-3); box-shadow: 0 8px 30px rgba(200,170,110,0.15); }
+.tendency-hero {
+  text-align: center;
+  margin-bottom: 18px;
+}
+.tendency-hero img {
+  width: 150px; height: 150px;
+  object-fit: contain;
+  border-radius: 50%;
+  border: 3px solid var(--gold-3);
+  background: radial-gradient(circle, #f0e6d2 0%, #d9cbb0 100%);
+  box-shadow: 0 0 24px rgba(200,170,110,0.4);
+}
+.tendency-rank {
+  font-family: 'Cinzel', 'Noto Sans KR', 'Malgun Gothic', serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.15em;
+  color: var(--gold-1);
+  text-align: center;
+  margin-bottom: 4px;
+}
+.tendency h3 {
+  font-family: 'Cinzel', 'Noto Sans KR', serif;
+  text-align: center;
+  color: var(--gold-0);
+  font-size: 1.5rem;
+  margin: 0 0 18px;
+  text-shadow: 0 0 14px rgba(200,170,110,0.3);
+}
+.tendency .desc {
+  line-height: 1.85;
+  color: var(--text);
+  margin: 0 0 16px;
+  font-size: 0.98rem;
+}
+.tag-line {
+  margin: 12px 0;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  line-height: 1.7;
+  font-size: 0.93rem;
+}
+.tag-caution { background: rgba(255,160,80,0.08);  border-left: 3px solid #ffa050; }
+.tag-pros    { background: rgba(71,209,124,0.09);  border-left: 3px solid var(--pros); }
+.tag-cons    { background: rgba(255,107,107,0.09); border-left: 3px solid var(--cons); }
+.tag-label { font-family: 'Cinzel', 'Noto Sans KR', 'Malgun Gothic', serif; font-weight: 700; margin-right: 8px; }
+.tag-pros    .tag-label { color: var(--pros); }
+.tag-cons    .tag-label { color: var(--cons); }
+.tag-caution .tag-label { color: #ffa050; }
+
+/* 상세 성향 토글 */
+.traits { margin: 22px 0; }
+.trait-item {
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--gold-3);
+  border-radius: var(--radius);
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+.trait-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  cursor: pointer;
+  transition: background .15s ease;
+}
+.trait-head:hover { background: rgba(200,170,110,0.05); }
+.trait-head img {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  object-fit: contain;
+  background: radial-gradient(circle, #f0e6d2, #d9cbb0);
+  border: 1px solid var(--gold-3);
+  flex-shrink: 0;
+}
+.trait-head strong {
+  flex: 1;
+  color: var(--gold-0);
+  font-size: 1.02rem;
+}
+.trait-head .chev { color: var(--gold-1); font-size: 0.8rem; transition: transform .2s ease; }
+.trait-item.open .chev { transform: rotate(180deg); }
+.trait-body {
+  display: none;
+  padding: 4px 18px 18px 72px;
+  line-height: 1.8;
+  color: var(--text-dim);
+  font-size: 0.94rem;
+}
+.trait-item.open .trait-body { display: block; }
+
+/* 챔피언 추천 */
+.champ-box {
+  margin: 22px 0;
+  padding: 24px;
+  background: linear-gradient(180deg, var(--bg-2), var(--bg-1));
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.champ-box h4 {
+  font-family: 'Cinzel', 'Noto Sans KR', 'Malgun Gothic', serif;
+  color: var(--cyan);
+  margin: 0 0 6px;
+  text-align: center;
+  font-size: 1.15rem;
+}
+.champ-playstyle {
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 0.92rem;
+  line-height: 1.6;
+  margin: 0 0 18px;
+}
+.champ-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+.champ-list li {
+  padding: 9px 18px;
+  border-radius: 24px;
+  background: var(--bg-3);
+  border: 1px solid var(--gold-3);
+  color: var(--gold-0);
+  font-size: 0.92rem;
+  font-weight: 500;
+  transition: all .15s ease;
+}
+.champ-list li:hover {
+  background: linear-gradient(180deg, var(--gold-2), var(--gold-1));
+  color: #10141a;
+  transform: translateY(-2px);
+}
+.champ-extra-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--gold-1);
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin: 16px 0 10px;
+}
+.champ-extra-title img { width: 24px; height: 24px; border-radius: 50%; background: #f0e6d2; }
+
+/* 액션 버튼 영역 */
+.actions {
+  margin-top: 40px;
+  padding-top: 26px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+.actions .btn { min-width: 150px; }
+
+/* 하단 푸터 */
+.foot {
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 0.78rem;
+  margin-top: 28px;
+  line-height: 1.6;
+}
+.foot .disclaimer { opacity: 0.7; }
+
+/* 토스트 */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 32px;
+  transform: translateX(-50%) translateY(20px);
+  background: linear-gradient(180deg, var(--gold-2), var(--gold-1));
+  color: #10141a;
+  font-weight: 700;
+  padding: 14px 24px;
+  border-radius: var(--radius);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+  opacity: 0;
+  pointer-events: none;
+  transition: all .3s ease;
+  z-index: 100;
+  font-size: 0.92rem;
+  max-width: 90vw;
+  text-align: center;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* 등장 애니메이션 */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.reveal { animation: fadeUp .5s ease both; }
+
+/* ---------- 반응형 ---------- */
+@media (max-width: 600px) {
+  .page { padding: 20px 12px 48px; }
+  .frame { padding: 24px 16px; }
+  .q-card { padding: 18px 14px; }
+  .opt { padding: 12px 14px 12px 42px; font-size: 0.93rem; }
+  .tendency { padding: 20px 16px; }
+  .tendency-hero img { width: 120px; height: 120px; }
+  .trait-body { padding-left: 18px; }
+  .actions .btn { min-width: 0; flex: 1 1 45%; }
+}

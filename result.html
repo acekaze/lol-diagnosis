@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>롤 성향 진단 · 결과</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="assets/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+</head>
+<body>
+  <div class="page">
+    <div class="wrap">
+      <div class="frame reveal">
+        <p class="brand-kicker">Summoner's Rift · Result</p>
+        <h1 class="title">당신의 <span class="accent">롤 성향</span> 결과</h1>
+        <div class="divider"><span class="gem"></span></div>
+
+        <div class="chart-box">
+          <canvas id="radarChart"></canvas>
+        </div>
+
+        <h2 class="section-title">📊 포지션별 점수</h2>
+        <ul class="score-badges" id="scoreBadges"></ul>
+
+        <div id="firstTendency"></div>
+        <div id="secondTendency"></div>
+
+        <h2 class="section-title">🔍 상세 성향 분석</h2>
+        <div class="traits" id="traits"></div>
+
+        <div id="champMain" class="champ-box" style="display:none;">
+          <h4>🎯 맞춤 챔피언 추천</h4>
+          <p class="champ-playstyle" id="champPlaystyle"></p>
+          <ul class="champ-list" id="champList"></ul>
+          <div style="text-align:center; margin-top:18px;">
+            <button type="button" class="btn btn-ghost" id="moreChampBtn" onclick="toggleExtra()">더 많은 챔피언 보기</button>
+          </div>
+        </div>
+
+        <div id="champExtra" class="champ-box" style="display:none;">
+          <h4>💡 추가 챔피언 제안</h4>
+          <p class="champ-playstyle">주요 성향 외에 이런 챔피언들은 어떠세요?</p>
+          <div id="extraFirst"></div>
+          <div id="extraSecond" style="margin-top:14px;"></div>
+        </div>
+
+        <div class="actions">
+          <button type="button" class="btn btn-ghost" onclick="restart()">🔁 다시하기</button>
+          <button type="button" class="btn btn-cyan" onclick="copySummary()">📋 결과 요약 복사</button>
+          <button type="button" class="btn btn-primary" onclick="copyLink()">🔗 링크 공유</button>
+        </div>
+
+        <p class="foot">
+          <span class="disclaimer">본 진단은 재미를 위한 콘텐츠이며, 실제 실력이나 성격을 규정하지 않습니다.</span>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // 포지션 한글명 → 이미지 파일명
+    const imgOf = { "탑":"top", "정글":"jungle", "미드":"mid", "원딜":"adc", "서폿":"support" };
+    const IMG = p => `assets/img/${imgOf[p]}.png`;
+
+    // ---- 성향 데이터 (원본 콘텐츠 유지) ----
+    const positionDataStore = {
+      "탑": {
+        title: `탑 라이너 (Top Laner)`,
+        mainDesc: `당신은 듬직하고 인내심이 많은 타입으로, 고통을 견뎌내는 힘이 강하고 주어진 목표를 달성하는 것을 즐깁니다. 독립적으로도 일을 잘 수행하며, 외로움을 잘 견딥니다. 주변으로부터 의지가 강하다는 얘기를 종종 듣습니다. 사소한 문제에 스트레스를 받기도 하지만, 당신은 금방 마음을 다잡아 툭툭 털고 일어납니다.`,
+        cautionDesc: `다만, 때론 주변의 얘기를 듣지 않고 자신이 생각하는 대로 밀고 나가는 고집이 주변에 원망거리가 되기도 합니다. 목표를 달성하려 주변의 생각과 감정을 무시하는 경향이 있습니다. 현실과 협곡에서 모두 승리하려면, 다른 사람의 의견도 경청하는 습관이 필요합니다.`,
+        pros: `굳건함, 인내심, 목표 달성 능력, 독립성`,
+        cons: `고집불통, 이기심, 타인 의견 무시 경향`
+      },
+      "정글": {
+        title: `정글러 (Jungler)`,
+        mainDesc: `당신은 타인에게 도움을 주는 것을 좋아하며, 그것에 대한 인정을 받을 때 큰 기쁨을 느낍니다. 세부적인 내용을 챙기기보다 큰 그림, 큰 판을 짜는 것을 즐기며, 자신이 생각한 대로 일이 흘러갈 때 보람을 느낍니다. 새롭고 특별한 것을 좋아하며 창의적이라는 얘기를 종종 듣습니다. 때론 사람들이 몰라주는 것 같아 속상하기도 하지만, 당신은 굴하지 않고 다른 이에게 영향을 주는 것을 멈추지 않습니다.`,
+        cautionDesc: `다만, 인정 욕구가 강해서 누가 알아주지 않으면 화를 내거나, 과한 생색으로 도움을 주고도 좋은 소리를 못 듣는 자충수를 두기도 합니다. 특별하게 보이려는 의외의 행동이 사람들을 당혹스럽게 하기도 합니다. 현실과 협곡에서 모두 승리하려면, 보편적인 방법으로 팀과 합을 맞추는 연습이 필요합니다.`,
+        pros: `창의성, 큰 그림 설계, 타인 도움 선호`,
+        cons: `생색, 관종 기질, 때론 엉뚱한 행동`
+      },
+      "미드": {
+        title: `미드 라이너 (Mid Laner)`,
+        mainDesc: `상황을 주도적으로 이끄는 것을 좋아하고, 자신이 중심이나 주인공 역할을 맡을 때 가장 힘을 얻는 타입입니다. 자신감이 넘치고 승부욕이 강해 주어진 여건에서 최선을 다하며, 위기나 한계를 극복하는 것을 즐깁니다. 주변에서 리더십이 있다고 인식되기도 합니다. '이 상황은 내가 해결해야 해!'라는 솔선수범이 때론 피곤하지만, 당신은 팀의 승리와 자신의 명예를 위해 다시 일어섭니다.`,
+        cautionDesc: `다만, 목표를 위해 너무 지시적이거나 잘난 체하는 모습이 사람들에게 거부감을 주기도 합니다. 자신이 최고라는 생각은 거만한 느낌을 주고, 실력이 뒷받침되지 못하면 큰 실망을 안겨줍니다. 현실과 협곡에서 모두 승리하려면, 사람들의 의견을 잘 듣고 반영하며 겸손한 모습을 보이는 것이 필요합니다.`,
+        pros: `주도성, 리더십, 자신감, 승부욕`,
+        cons: `지시적, 거만함, 때론 독선적`
+      },
+      "원딜": {
+        title: `원거리 딜러 (ADC)`,
+        mainDesc: `당신은 침착하고 냉철한 성격으로, 상황을 빠르게 판단해 가장 적절한 방법을 찾아내는 능력이 탁월합니다. 큰 부담 앞에서도 끝까지 책임을 다하려는 모습은 주변에 든든한 신뢰를 줍니다. 정보와 방법이 명확하면 빠르게 계획을 세우고 차분히 한 단계씩 이뤄냅니다. 위기 앞에서 움츠러들 때도 있지만, 부담을 이겨내는 것이 자신의 힘이라는 걸 잘 알고 있습니다. 섬세한 집중력이 발휘되려면 불편한 변수가 제거되어야 하죠.`,
+        cautionDesc: `그래서인지 뜻대로 풀리지 않을 때 예민해지는 경향이 있어, 팀원에게 짜증을 내거나 독설을 하기도 합니다. 이런 감정 기복은 주변 사람이 당신을 어려워하게 만듭니다. 현실과 협곡에서 모두 승리하려면, 계획대로 되지 않을 때도 여유로운 마음으로 주변을 대하는 것이 필요합니다.`,
+        pros: `냉철함, 판단력, 책임감, 계획성`,
+        cons: `예민함, 짜증, 감정 기복`
+      },
+      "서폿": {
+        title: `서포터 (Support)`,
+        mainDesc: `당신은 타인을 위해 많은 에너지를 쏟는 타입으로, 양보와 배려, 헌신의 아이콘으로 여겨집니다. 좋은 관계를 위해 꾸준히 노력하고 중재자 역할을 하며 편안한 분위기를 만들어냅니다. 조화와 공존에 애쓰며 착하다, 배려심 있다는 얘기를 종종 듣습니다. 타인의 마음이나 이익이 먼저 떠오르고 공감 능력이 좋아, 누가 알아주지 않아도 스스로 만족스러우면 보람을 느낍니다. 분란이 일어나면 가장 스트레스받는 사람이면서, 동시에 가장 훌륭한 조정자가 됩니다.`,
+        cautionDesc: `다만, 너무 수동적인 모습으로 주변에 답답함을 유발하고, 주변을 챙기느라 정작 자신의 일을 못 챙기기도 합니다. 책임지고 이끌어야 할 때도 비난이나 부담이 두려워 안전한 영역에 머무르곤 합니다. 현실과 협곡에서 모두 승리하려면, 과감한 도전이나 주도적인 결정을 시도하는 것이 필요합니다.`,
+        pros: `배려심, 공감 능력, 중재자 역할`,
+        cons: `수동적, 자기 일 못 챙김, 도전 부족`
+      }
+    };
+
+    const championRecommendations = {
+      "탑-정글":{playstyle:`글로벌 영향력과 기동력을 활용한 타 라인 개입 및 스노우볼링`,champions:["카밀","럼블","쉔","아트록스","클레드"]},
+      "탑-미드":{playstyle:`강력한 라인전 능력과 개인 피지컬을 바탕으로 한 캐리형 플레이`,champions:["레넥톤","다리우스","이렐리아","잭스","아트록스"]},
+      "탑-서폿":{playstyle:`팀을 위해 헌신하는 든든한 탱커 또는 CC 기반의 한타 기여`,champions:["오른","마오카이","말파이트","사이온","크산테"]},
+      "탑-원딜":{playstyle:`강력한 1대1 능력을 바탕으로 한 스플릿 푸쉬 운영 또는 사이드 공격 옵션`,champions:["피오라","카밀","잭스","제이스","요릭"]},
+      "정글-탑":{playstyle:`강력한 교전 능력과 성장력으로 초중반 교전을 주도하고, 오브젝트 컨트롤과 탑 연계로 스노우볼을 굴리는 전사형/성장형 정글`,champions:["리 신","비에고","자르반 4세","신 짜오","판테온"]},
+      "정글-미드":{playstyle:`강력한 딜링으로 암살 또는 누킹, 미드 연계로 맵 중앙을 장악하고 빠르게 템포를 올리는 플레이`,champions:["카직스","이블린","에코","탈리야","니달리"]},
+      "정글-원딜":{playstyle:`성장을 중시하며 후반 캐리력을 도모하거나, 원거리에서 안정적으로 지속딜을 넣는 성장형/딜링형 정글`,champions:["킨드레드","그레이브즈","다이애나","마스터 이","카서스"]},
+      "정글-서폿":{playstyle:`강력한 CC나 아군 강화로 팀을 보조하고, 오브젝트 컨트롤과 시야 장악으로 운영을 지원하는 버프형/탱커형 정글`,champions:["아이번","누누와 윌럼프","자크","아무무","세주아니"]},
+      "미드-탑":{playstyle:`강력한 라인전 바탕의 스노우볼링, 사이드 운영 주도`,champions:["이렐리아","아칼리","요네","제이스","라이즈"]},
+      "미드-정글":{playstyle:`맵 장악 및 오브젝트 컨트롤, 교전 유도`,champions:["트위스티드 페이트","탈리야","갈리오","아리","키아나"]},
+      "미드-원딜":{playstyle:`강력한 후반 캐리, 안정적인 딜링 포지션`,champions:["카시오페아","아지르","코르키","빅토르","오리아나"]},
+      "미드-서폿":{playstyle:`아군 지원 및 강화, 팀플레이 중심`,champions:["카르마","룰루","세라핀","모르가나","애니비아"]},
+      "원딜-탑":{playstyle:`후반 캐리형, 안정적인 포지셔닝과 카이팅`,champions:["베인","케이틀린","징크스","시비르","자야"]},
+      "원딜-정글":{playstyle:`뛰어난 생존기나 변수 창출 능력을 바탕으로 공격적인 포지셔닝`,champions:["카이사","사미라","트위치","루시안","이즈리얼"]},
+      "원딜-미드":{playstyle:`강력한 라인전 압박과 뛰어난 기동성으로 초중반 스노우볼`,champions:["루시안","트리스타나","코르키","케이틀린","드레이븐"]},
+      "원딜-서폿":{playstyle:`강력한 유틸리티나 광역 CC로 한타에서 아군을 지원하거나 직접 판을 짜는 능력`,champions:["애쉬","바루스","진","미스 포츈","세나"]},
+      "서폿-탑":{playstyle:`강력한 아군 보호와 탱킹으로 최전선에서 팀원을 지키거나, 뛰어난 CC로 한타를 여는 탱커형 서포터`,champions:["알리스타","브라움","레오나","탐 켄치","렐"]},
+      "서폿-정글":{playstyle:`아군에게 강력한 버프를 제공하거나, 뛰어난 기동성과 CC로 맵 전체에 영향력을 행사하는 유틸/로밍형 서포터`,champions:["바드","잔나","소라카","파이크","라칸"]},
+      "서폿-미드":{playstyle:`강력한 이니시에이팅이나 광역 CC로 한타를 설계하고 지배하는 플레이메이커형 서포터`,champions:["쓰레쉬","노틸러스","블리츠크랭크","모르가나","자이라"]},
+      "서폿-원딜":{playstyle:`라인전에서 원거리 딜러를 강력히 보좌하며 압박하거나, 자신도 상당한 견제력으로 라인전을 리드하는 공격형 서포터`,champions:["럭스","카르마","세나","브랜드","벨코즈"]}
+    };
+
+    const additionalSinglePositionChampions = {
+      "탑":["가렌","세트","오른"],
+      "정글":["엘리스","워윅","그라가스"],
+      "미드":["벡스","신드라","아지르"],
+      "원딜":["이즈리얼","진","케이틀린"],
+      "서폿":["레나타 글라스크","밀리오","소나"]
+    };
+
+    let firstTendency = null, secondTendency = null;
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const raw = sessionStorage.getItem('lolQuizScores') || null;
+      if (!raw) { alert("진단 정보가 없습니다. 퀴즈를 먼저 진행해주세요!"); location.href = "quiz.html"; return; }
+      const points = JSON.parse(raw);
+
+      // 레이더 차트 (Chart.js 로드 실패해도 나머지 결과는 정상 렌더되도록 방어)
+      const labels = Object.keys(points);
+      try {
+      const ctx = document.getElementById('radarChart');
+      if (typeof Chart === 'undefined') throw new Error('Chart.js not loaded');
+      new Chart(ctx.getContext('2d'), {
+        type: 'radar',
+        data: {
+          labels: labels.map(l => `${l} (${points[l]})`),
+          datasets: [{
+            label: '나의 롤 성향', data: Object.values(points), fill: true,
+            backgroundColor: 'rgba(200,170,110,0.22)', borderColor: '#c8aa6e',
+            pointBackgroundColor: '#c8aa6e', pointBorderColor: '#010a13',
+            pointHoverBackgroundColor: '#fff', pointHoverBorderColor: '#c8aa6e', borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: { r: {
+            angleLines: { color: 'rgba(200,170,110,0.25)' },
+            grid: { color: 'rgba(200,170,110,0.22)' },
+            suggestedMin: 0, suggestedMax: 10,
+            pointLabels: { font: { size: 13, weight: 'bold', family: "'Noto Sans KR', sans-serif" }, color: '#c8aa6e' },
+            ticks: { stepSize: 2, backdropColor: 'rgba(1,10,19,0.75)', color: '#0ac8b9', font: { size: 10 } }
+          }},
+          plugins: { legend: { display: false }, tooltip: {
+            backgroundColor: 'rgba(1,10,19,0.92)', borderColor: '#785a28', borderWidth: 1, padding: 10, displayColors: false
+          }}
+        }
+      });
+      } catch (e) {
+        // 차트 로드 실패 시 안내 문구로 대체 (점수는 아래 뱃지로도 확인 가능)
+        const cb = document.querySelector('.chart-box');
+        if (cb) cb.innerHTML = '<p style="text-align:center;color:var(--text-dim);padding:40px 10px;line-height:1.6;">차트를 불러오지 못했어요.<br>아래 점수로 확인해주세요.</p>';
+      }
+
+      // 점수 뱃지
+      const badges = document.getElementById('scoreBadges');
+      labels.forEach(l => {
+        const li = document.createElement('li');
+        li.innerHTML = `<b>${l}</b> ${points[l]}점`;
+        badges.appendChild(li);
+      });
+
+      const sorted = Object.entries(points).sort((a, b) => b[1] - a[1]);
+      firstTendency = sorted[0];
+      secondTendency = (sorted[1] && sorted[1][1] > 0) ? sorted[1] : null;
+
+      renderTendency('firstTendency', firstTendency, '🥇 퍼스트 성향', true);
+      if (secondTendency) {
+        renderTendency('secondTendency', secondTendency, '🥈 세컨드 성향', false);
+      } else {
+        document.getElementById('secondTendency').innerHTML =
+          `<div class="tendency"><p class="desc" style="text-align:center; margin:0;">뚜렷한 세컨드 성향은 나타나지 않았습니다. 한 분야에 특화된 성향을 가지고 계시는군요!</p></div>`;
+      }
+
+      renderTraits(points);
+      renderChampions();
+    });
+
+    function renderTendency(elId, tendency, rankLabel, isFirst) {
+      const pos = tendency[0], d = positionDataStore[pos];
+      document.getElementById(elId).innerHTML = `
+        <div class="tendency ${isFirst ? 'first' : ''}">
+          <div class="tendency-hero"><img src="${IMG(pos)}" alt="${pos}"></div>
+          <div class="tendency-rank">${rankLabel}</div>
+          <h3>${d.title} · ${tendency[1]}점</h3>
+          <p class="desc">${d.mainDesc}</p>
+          <div class="tag-line tag-caution"><span class="tag-label">참고할 점</span>${d.cautionDesc}</div>
+          <div class="tag-line tag-pros"><span class="tag-label">강점</span>${d.pros}</div>
+          <div class="tag-line tag-cons"><span class="tag-label">보완점</span>${d.cons}</div>
+        </div>`;
+    }
+
+    function renderTraits(points) {
+      let html = '';
+      Object.keys(points).forEach(pos => {
+        if (points[pos] <= 0) return;
+        const score = points[pos];
+        const { title, comment } = traitDetail(pos, score);
+        html += `
+          <div class="trait-item">
+            <div class="trait-head" onclick="this.parentElement.classList.toggle('open')">
+              <img src="${IMG(pos)}" alt="${pos}">
+              <strong>${pos} (${score}점) · ${title}</strong>
+              <span class="chev">▼</span>
+            </div>
+            <div class="trait-body">${comment}</div>
+          </div>`;
+      });
+      document.getElementById('traits').innerHTML = html;
+    }
+
+    function traitDetail(pos, score) {
+      const map = {
+        "탑": {
+          hi: [`불굴의 외로운 늑대 🐺`, `강철 같은 의지와 불굴의 투지를 지닌 성향입니다. 어떤 역경에도 쉽게 좌절하지 않으며, 자신의 판단과 실력에 대한 강한 믿음이 있습니다. 목표를 향한 집념과 추진력은 타의 추종을 불허하며, 때로는 고독을 즐기며 스스로를 극한까지 단련시키는 타입입니다. 팀이 어려운 상황일수록 진가가 드러나 판도를 뒤엎는 캐리력을 발휘하거나 철옹성 같은 방어를 보여줍니다. 다만 지나친 고집이나 독단이 팀워크를 저해할 수 있으니 소통에도 신경 쓰는 것이 좋습니다. (캐리형 브루저, 스플릿 푸쉬 스페셜리스트, 하드 탱커 역할군에 최적화)`],
+          mid: [`꽤나 듬직한 바위 🧱`, `제법 뚜렷한 목표 의식과 독립적인 성향을 보이며, 중요한 순간에 자신만의 판단으로 행동하려는 경향이 있습니다. 우직함과 인내심이 나타나기 시작하며, 혼자서도 묵묵히 상황을 헤쳐나가는 모습을 종종 보입니다. 팀에서는 안정적인 버팀목 역할을 하거나 때때로 결정적인 한 방을 보여줄 가능성이 있습니다. (브루저, 탱커 역할군을 시도해볼 만하며 스플릿 운영에도 관심을 가져볼 수 있음)`],
+          lo: [`아주 작은 뚝심의 씨앗 🌱`, `탑 라이너의 굳건함이 주된 성향은 아니지만, 때때로 독립적으로 판단하거나 자신만의 원칙을 내세우는 모습이 약간 나타날 수 있습니다. 어려운 상황에서도 쉽게 포기하지 않으려는 마음이 스쳐 지나갈 때가 있습니다.`]
+        },
+        "정글": {
+          hi: [`협곡의 지배자 🦅`, `맵 전체를 자신의 무대처럼 활용하며 게임의 모든 요소에 관여하려는 강한 영향력을 가진 정글러입니다. 천재적인 번뜩임과 독창적인 전략으로 게임을 새로운 국면으로 이끌어갑니다. 팀원 상황을 끊임없이 주시하며 최적의 타이밍에 개입해 승리를 가져오는 해결사 역할을 합니다. 때로는 과도한 인정 욕구나 지나치게 독특한 플레이가 팀원을 당황시킬 수 있지만, 존재감은 승패를 가르는 변수가 됩니다. (초반부터 강력한 육식형 정글, 혹은 하드 캐리형 정글에 최적화)`],
+          mid: [`판을 보는 설계자 📐`, `게임의 전체 판을 읽고 자신만의 그림을 그리려 시도합니다. 제법 괜찮은 직관력과 창의성으로 기회를 포착하려 하며, 때로는 예측하기 어려운 움직임으로 상대를 당황시킵니다. 팀원에게 필요한 도움을 제공해 흐름을 유리하게 만들려는 성향이 나타납니다. (캐리형 성장 정글, 변칙적인 암살자, 운영 중심 정글을 경험해보는 것도 좋음)`],
+          lo: [`아주 작은 조력의 바람 🌿`, `맵 전체를 활용하는 정글러의 창의성이 주된 모습은 아니지만, 가끔 틀에 박히지 않은 생각을 하거나 보이지 않는 곳에서 도움을 주려는 마음이 살짝 나타날 수 있습니다.`]
+        },
+        "미드": {
+          hi: [`협곡의 슈퍼스타 🏆`, `게임의 주인공이 되어 스포트라이트를 받기를 원하는 타고난 스타 플레이어입니다. 압도적인 자신감과 불타는 승부욕으로 무장했으며, 팀 승리를 위해 자신이 모든 걸 해결해야 한다는 강한 책임감을 느낍니다. 상황을 지배하는 카리스마와 뛰어난 판단력으로 팀을 진두지휘하며, 위기 상황일수록 빛을 발합니다. 다만 지나치게 지시적이거나 독선적인 모습이 부담을 줄 수 있으니 겸손과 경청도 필요합니다. (하드 캐리형 암살자·마법사, 또는 오더형 미드에 최적화)`],
+          mid: [`무대의 조율자 🎶`, `제법 뛰어난 상황 판단력과 자신감으로 게임 흐름에 적극 관여하려는 성향을 보입니다. 팀원에게 의견을 제시하고 함께 움직이려 하며, 중요한 순간에 팀을 유리하게 만드는 플레이를 하고 싶어 합니다. 자신의 능력이 팀에 기여하고 인정받을 때 만족감을 느낍니다. (강력한 라인전·로밍으로 영향력을 발휘하는 마법사/암살자 플레이를 시도해볼 만함)`],
+          lo: [`아주 작은 별빛 🌟`, `게임의 중심에서 빛나고 싶은 미드의 열망이 강하진 않지만, 가끔 주목받거나 상황을 주도하고 싶다는 생각을 잠깐 할 수 있습니다. 작은 행동이 인정받을 때 소소한 만족감을 느낄 수 있습니다.`]
+        },
+        "원딜": {
+          hi: [`완벽을 추구하는 명사수 🏹`, `한 치의 오차도 용납하지 않으려는 완벽주의 성향의 명사수입니다. 극도의 집중력과 세밀한 계산으로 모든 변수를 통제하려 하며, 최상의 효율과 결과를 추구합니다. 때로는 예민하거나 비판적일 수 있지만, 이는 더 나은 결과를 위한 열정 때문입니다. 팀 승리를 위해 엄청난 캐리력을 발휘하며, 불리한 상황에서도 흔들림 없는 정밀함으로 게임을 뒤집습니다. (하이퍼 캐리형 원거리 딜러에 최적화)`],
+          mid: [`계산적인 명사수 📊`, `뛰어난 판단력과 집중력으로 합리적인 수를 계산하려는 전략가적 면모를 보입니다. 정보를 수집·분석해 계획을 세우는 것을 선호하며, 감정보다 논리로 행동하려는 경향이 있습니다. 팀의 핵심 딜러로서 안정적인 딜링을 중요시하고, 영리한 포지셔닝으로 가치를 입증하려 합니다. (안정적 성장·지속딜을 중시하는 원거리 딜러에 잘 맞음)`],
+          lo: [`아주 작은 신중함 🎯`, `원거리 딜러의 침착함이 주된 모습은 아니지만, 간혹 신중하게 상황을 관찰하거나 안정적인 것을 선호하는 경향이 약간 나타납니다. 리스크보다 안전한 선택을 하려는 마음이 들 때가 있습니다.`]
+        },
+        "서폿": {
+          hi: [`승리의 설계자이자 어머니 🕊️`, `팀 전체를 아우르는 넓은 시야와 뛰어난 판단력을 가진, 팀의 보이지 않는 리더입니다. 모든 팀원을 세심하게 살피고 지원하며 최상의 컨디션을 유지하도록 돕습니다. 때로는 과감한 이니시에이팅으로 한타를 열거나 절묘한 스킬 활용으로 위기의 아군을 구합니다. 존재 자체가 팀에 심리적 안정감과 승리에 대한 믿음을 줍니다. 다만 모든 걸 책임지려는 부담에 짓눌리거나 의견을 강하게 못 내 답답함을 유발할 수도 있습니다. (로밍형·이니시에이터·유틸/힐러형 서포터에 최적화)`],
+          mid: [`믿음직한 지원가 🤝`, `팀원을 위해 기꺼이 헌신하려는 마음을 가진 믿음직한 지원가입니다. 좋은 공감 능력으로 팀원의 필요를 파악하고 채워주려 노력합니다. 승리를 위해 궂은일도 마다하지 않으며, 결정적인 순간에 아군을 보호해 기여합니다. 다만 남을 챙기느라 자신을 못 돌보거나 다소 수동적일 수 있으니 가끔은 주도적인 판단도 필요합니다. (탱커형/유틸리티형 서포터를 시도해볼 만함)`],
+          lo: [`아주 작은 온기 ☀️`, `타인을 돕는 서포터의 헌신이 강하게 드러나진 않지만, 때때로 주변을 배려하거나 팀의 조화를 생각하는 마음이 조금 생길 수 있습니다. 누군가를 돕는 데서 작은 보람을 느낄 가능성이 있습니다.`]
+        }
+      };
+      const t = map[pos];
+      let key = score >= 5 ? 'hi' : (score >= 3 ? 'mid' : 'lo');
+      return { title: t[key][0], comment: t[key][1] };
+    }
+
+    function renderChampions() {
+      const box = document.getElementById('champMain');
+      const playstyle = document.getElementById('champPlaystyle');
+      const list = document.getElementById('champList');
+      if (firstTendency && secondTendency) {
+        const key = `${firstTendency[0]}-${secondTendency[0]}`;
+        const rec = championRecommendations[key];
+        if (rec) {
+          playstyle.textContent = `추천 플레이스타일: ${rec.playstyle}`;
+          rec.champions.forEach(c => { const li = document.createElement('li'); li.textContent = c; list.appendChild(li); });
+        } else {
+          playstyle.textContent = `당신의 주 성향 '${firstTendency[0]}'에 맞는 다양한 챔피언을 탐색해보세요!`;
+        }
+        box.style.display = 'block';
+      } else if (firstTendency) {
+        playstyle.textContent = `당신은 '${firstTendency[0]}' 성향에 매우 특화되어 있군요! 이 포지션의 다양한 챔피언을 플레이해보세요.`;
+        box.style.display = 'block';
+      }
+      // 추가 챔피언
+      renderExtra('extraFirst', firstTendency);
+      renderExtra('extraSecond', secondTendency);
+    }
+
+    function renderExtra(elId, tendency) {
+      const el = document.getElementById(elId);
+      if (!tendency) { el.innerHTML = ''; return; }
+      const pos = tendency[0], champs = additionalSinglePositionChampions[pos];
+      if (!champs) { el.innerHTML = ''; return; }
+      let html = `<div class="champ-extra-title"><img src="${IMG(pos)}" alt="${pos}"> ${positionDataStore[pos].title} 추가 추천</div><ul class="champ-list">`;
+      champs.forEach(c => html += `<li>${c}</li>`);
+      html += `</ul>`;
+      el.innerHTML = html;
+    }
+
+    function toggleExtra() {
+      const ex = document.getElementById('champExtra');
+      const btn = document.getElementById('moreChampBtn');
+      const open = ex.style.display === 'block';
+      ex.style.display = open ? 'none' : 'block';
+      btn.textContent = open ? '더 많은 챔피언 보기' : '추가 추천 숨기기';
+      if (!open) ex.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function restart() { sessionStorage.removeItem('lolQuizScores'); location.href = "quiz.html"; }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.classList.add('show');
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+    }
+
+    function copyText(text, msg) {
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(() => showToast(msg)).catch(() => fallbackCopy(text, msg));
+      } else { fallbackCopy(text, msg); }
+    }
+    function fallbackCopy(text, msg) {
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.style.position = 'fixed'; ta.style.top = '0'; ta.style.left = '0';
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      try { document.execCommand('copy'); showToast(msg); }
+      catch (e) { showToast('복사에 실패했어요. 직접 복사해주세요.'); }
+      document.body.removeChild(ta);
+    }
+
+    function copySummary() {
+      if (!firstTendency) { showToast('결과 정보가 없습니다.'); return; }
+      const pos = firstTendency[0], d = positionDataStore[pos];
+      let t = `✨ 나의 롤 성향 진단 결과 ✨\n\n🥇 퍼스트 성향: ${d.title} (${firstTendency[1]}점)\n`;
+      if (secondTendency) t += `🥈 세컨드 성향: ${positionDataStore[secondTendency[0]].title} (${secondTendency[1]}점)\n`;
+      t += `강점: ${d.pros}\n보완점: ${d.cons}\n\n🔗 진단해보기:\n${location.href}`;
+      copyText(t.trim(), '결과 요약이 복사되었어요!');
+    }
+    function copyLink() { copyText(location.href, '링크가 복사되었어요! 친구에게 공유해보세요.'); }
+  </script>
+</body>
+</html>
